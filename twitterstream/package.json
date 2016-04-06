@@ -1,0 +1,22 @@
+{
+  "name": "twitterstream",
+  "version": "1.0.0",
+  "description": "twitter stream app using streaming API and AWS SQS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "stream": "node index.js"
+  },
+  "keywords": [
+    "twitter",
+    "stream",
+    "AWS",
+    "SQS"
+  ],
+  "author": "houlianglv",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.3.1",
+    "twit": "^2.2.3"
+  }
+}
