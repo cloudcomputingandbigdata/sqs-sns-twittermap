@@ -6,13 +6,13 @@ var config = require('./config');
 var sqs = new SQS();
 
 // fetch tweets by streaming API
-var T = new Twit(config);
+var T = new Twit(config.auth);
 
 sqs.createQueue().then(function(url) {
   var cnt = 0;
   var tweetsList = [];
   var stream = T.stream('statuses/filter', {
-    track: 'food',
+    track: config.track,
     language: 'en',
     locations: ['-180.0', '-90.0', '180.0', '90.0']
   });
