@@ -8,9 +8,8 @@ var sqs = new SQS();
 // fetch tweets by streaming API
 var T = new Twit(config.auth);
 
-var keywords = ["soccer", "football", "messi", "beach", "food", "travel", "photo", "basketball", "nba", "gym"]
-
 var containKeyword = function(text) {
+  var keywords = config.track;
   var contained = false;
   for (var i=0; i<keywords.length; i++) {
     if (text.indexOf(keywords[i]) > -1) {
@@ -25,7 +24,7 @@ sqs.createQueue().then(function(url) {
   var cnt = 0;
   var tweetsList = [];
   var stream = T.stream('statuses/filter', {
-    track: config.track,
+    // track: config.track,
     language: 'en',
     locations: ['-180.0', '-90.0', '180.0', '90.0']
   });

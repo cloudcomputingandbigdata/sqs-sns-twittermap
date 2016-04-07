@@ -10,8 +10,6 @@ sentiment_analyzer = SentimentAnalyzer()
 topic = sns.create_or_get_topic('twittermap')
 queue = sqs.get_queue('twitterMap')
 
-keywords = ["soccer", "football", "messi", "beach", "food", "travel", "photo", "basketball", "nba", "gym"]
-
 if __name__ == '__main__':
     print 'Worker starts...'
     while True:
