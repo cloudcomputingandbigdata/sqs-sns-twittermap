@@ -8,6 +8,19 @@ var sqs = new SQS();
 // fetch tweets by streaming API
 var T = new Twit(config.auth);
 
+var keywords = ["soccer", "football", "messi", "beach", "food", "travel", "photo", "basketball", "nba", "gym"]
+
+var containKeyword = function(text) {
+  var contained = false;
+  for (var i=0; i<keywords.length; i++) {
+    if (text.indexOf(keywords[i]) > -1) {
+      contained = true;
+      break;
+    }
+  }
+  return contained;
+}
+
 sqs.createQueue().then(function(url) {
   var cnt = 0;
   var tweetsList = [];
@@ -17,7 +30,7 @@ sqs.createQueue().then(function(url) {
     locations: ['-180.0', '-90.0', '180.0', '90.0']
   });
   stream.on('tweet', function(tweet) {
-    if (tweet.place) {
+    if (tweet.place && containKeyword(tweet.text)) {
       console.log(tweet);
       tweetsList.push(tweet);
       ++cnt;

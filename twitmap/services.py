@@ -137,7 +137,8 @@ class SearchServices:
                     "description": h['contents'],
                     "datetime": h['datetime'],
                     "tweet_id": h['tweet_id'],
-                    "screen_name": h['screen_name']
+                    "screen_name": h['screen_name'],
+                    "sentiment": h['sentiment']
                 }
             }
             hits.append(hit)
@@ -146,7 +147,7 @@ class SearchServices:
 
         return output
 
-    def insert_tweet(self, id, contents, author, screen_name, timestamp, datetime, location_name, coordinates, country_code, country):
+    def insert_tweet(self, id, contents, author, screen_name, timestamp, datetime, location_name, coordinates, country_code, country, sentiment):
         body = {
             "tweet_id": id,
             "contents": contents,
@@ -157,7 +158,8 @@ class SearchServices:
             "location_name": location_name,
             "location": coordinates,
             "country_code": country_code,
-            "country": country
+            "country": country,
+            "sentiment": sentiment
         }
         res = self.es.feed_data(self.index, self.doc_type, body)
 

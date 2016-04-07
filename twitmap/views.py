@@ -1,9 +1,9 @@
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
-
-from services import SearchServices
-
+from django.views.decorators.csrf import csrf_exempt
+import requests
+from data_process import *
 
 # Create your views here.
 def index(request):
@@ -54,3 +54,25 @@ def test_search(request, keyword = ''):
     to_time = request.GET.get("to")
     output = services.get_results_by_keyword(keyword, from_time, to_time)
     return JsonResponse(output)
+
+@csrf_exempt
+def process_tweet(request):
+    type = request.META.get('HTTP_X_AMZ_SNS_MESSAGE_TYPE')
+    if type == 'SubscriptionConfirmation':
+        received_json_data = json.loads(request.body)
+        url = received_json_data['SubscribeURL']
+
+        response = requests.get(url)
+        return HttpResponse(response)
+    elif type == 'Notification':
+        received_json_data = json.loads(request.body)
+        id = received_json_data['MessageId']
+        message = received_json_data['Message']
+
+        data_process = DataProcess()
+        data_process.process(message)
+
+        return HttpResponse(message)
+    else:
+        return HttpResponse('haha')
+

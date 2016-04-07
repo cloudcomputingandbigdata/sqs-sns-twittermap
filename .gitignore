@@ -5,6 +5,8 @@
 /.idea/*
 /twitmap/static/twittermap/build/*
 /twitterstream/node_modules/*
+/worker/api_key.txt
+
 
 # Elastic Beanstalk Files
 

@@ -1,6 +1,6 @@
 var AWS = require('aws-sdk');
 AWS.config.update({
-  region: 'us-east-1'
+  region: 'us-west-2'
 });
 
 var sqs = function() {
