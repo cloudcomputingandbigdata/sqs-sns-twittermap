@@ -257,12 +257,12 @@ var TwitterMapController = React.createClass({
             </Accordion>
           </div>
           <div className="update-setting-container">
-            <Accordion title={"Tweets update setting"}>
+            <Accordion title={"Tweets update setting"} active={"active"}>
               <UpdateSetting onCheck={this.onCheckAutoUpdate} />
             </Accordion>
           </div>
           <div className="update-setting-container">
-            <Accordion title={"Statistics"}>
+            <Accordion title={"Statistics"} active={"active"}>
               <Counter number={this.state.number} />
             </Accordion>
           </div>

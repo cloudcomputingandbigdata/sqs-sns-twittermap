@@ -7,13 +7,14 @@ var Accordion = React.createClass({
   },
 
   render: function() {
+    var className = "content field " + (this.props.active ? this.props.active : '');
     return (
       <div className="ui accordion field">
         <div className="title">
           <i className="icon dropdown"></i>
           {this.props.title}
         </div>
-        <div className="content field active">
+        <div className={className}>
           {this.props.children}
         </div>
       </div>
