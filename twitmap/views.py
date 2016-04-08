@@ -4,6 +4,9 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from data_process import *
+from django_sse.views import BaseSseView
+from collections import deque
+
 
 # Create your views here.
 def index(request):
@@ -55,6 +58,8 @@ def test_search(request, keyword = ''):
     output = services.get_results_by_keyword(keyword, from_time, to_time)
     return JsonResponse(output)
 
+message_queue = deque()
+
 @csrf_exempt
 def process_tweet(request):
     type = request.META.get('HTTP_X_AMZ_SNS_MESSAGE_TYPE')
@@ -70,9 +75,22 @@ def process_tweet(request):
         message = received_json_data['Message']
 
         data_process = DataProcess()
-        data_process.process(message)
+        processed_message = data_process.process(message)
+
+        message_queue.append(json.dumps(data_process.transform(processed_message)))
 
         return HttpResponse(message)
     else:
         return HttpResponse('haha')
+
+
+class SseEndpoint(BaseSseView):
+    def iterator(self):
+        if message_queue:
+            self.sse.add_message("new_tweet", message_queue.pop())
+        else:
+            self.sse.add_message("new_tweet", 'no_new')
+
+        yield
+
 

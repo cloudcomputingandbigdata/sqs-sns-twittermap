@@ -25,13 +25,47 @@ var TwitterMapController = React.createClass({
       lat: null,
       lon: null,
       isAuto: false,
-      number: 0
+      number: 0,
+      positive: 0,
+      negative: 0,
+      neutral: 0,
+      new_tweets: 0,
+      new_tweets_on_map: 0
+    }
+  },
+
+  updateTweet(e) {
+    var that = this;
+    if (e.data != 'no_new' && this.pointsLayer) {
+      this.setState({
+        new_tweets: that.state.new_tweets + 1
+      }, function() {
+        console.log('new_tweets:' + that.state.new_tweets);
+        // console.log('new_tweets:' + e.data);
+        var tweet = JSON.parse(e.data);
+        if (tweet.geometry.coordinates) {
+          if (that.state.keyword && tweet.properties.description.indexOf(that.state.keyword) > 0) {
+            console.log("New tweet contains the keyword. Should update it on map!!!")
+            that.insertTweetOnMap(tweet, that.pointsLayer);
+            that.setState({
+              number: that.state.number + 1,
+              new_tweets_on_map: that.state.new_tweets_on_map + 1,
+            })
+          }
+        }
+      });
     }
   },
 
   componentDidMount() {
     this.pointsLayer = null;
     this.pin = null;
+
+    var that = this;
+    var source = new EventSource('/sse/');
+    source.addEventListener("new_tweet", function(e) {
+      that.updateTweet(e);
+    });
   },
 
   showPin() {
@@ -113,7 +147,14 @@ var TwitterMapController = React.createClass({
     var that = this;
     tweetLoader.loadByKeyword(keyword, parameters).done(function(data) {
       console.log(data);
-      that.state.number = data.hits.total;
+      that.setState({
+        number: data.hits.total,
+        positive: 0,
+        negative: 0,
+        neutral: 0,
+        new_tweets: 0,
+        new_tweets_on_map: 0
+      })
       var tweets = [];
       $('.menu').addClass("overlay");
       (function pollingLoad(scrollId){
@@ -135,9 +176,41 @@ var TwitterMapController = React.createClass({
     });
   },
 
+  insertTweetOnMap(tweet, clusterLayer) {
+    var coords = tweet.geometry.coordinates;
+    var url = "http://twitter.com/" + tweet.properties.screen_name + "/status/" + tweet.properties.tweet_id;
+    var text = "<div class='author'><strong>" + tweet.properties.title + "</strong></div>" +
+    "<div class='date'>" + tweet.properties.datetime + "</div>" +
+    "<div class='contents'>" + tweet.properties.description + "</div>" +
+    "<a href='" + url + "' target=_blank>View Tweet</a>" +
+    "</div>"
+    var marker = L.marker(new L.LatLng(coords[1], coords[0]), {
+      icon: L.icon(tweet.properties.icon),
+      description: text
+    });
+    marker.bindPopup(text);
+    clusterLayer.addLayer(marker);
+
+    // console.log(tweet.properties.sentiment)
+    if (tweet.properties.sentiment == 'positive') {
+      this.setState({
+        positive: this.state.positive++
+      })
+    } else if (tweet.properties.sentiment == 'negative') {
+      this.setState({
+        negative: this.state.negative++
+      })
+    } else {
+      this.setState({
+        neutral: this.state.neutral++
+      })
+    }
+  },
+
   showTweetsOnMap() {
     var mapbox = this.props.mapbox;
     var tweets = this.state.tweets;
+    var that = this;
     if (this.pointsLayer != null) {
       mapbox.removeLayer(this.pointsLayer);
     }
@@ -154,22 +227,7 @@ var TwitterMapController = React.createClass({
     });
 
     tweets.forEach(function(tweet) {
-      var coords = tweet.geometry.coordinates;
-      var url = "http://twitter.com/" + tweet.properties.screen_name + "/status/" + tweet.properties.tweet_id;
-      var text = "<div class='author'><strong>" + tweet.properties.title + "</strong></div>" +
-      "<div class='date'>" + tweet.properties.datetime + "</div>" + 
-      "<div class='contents'>" + tweet.properties.description + "</div>" +
-      "<a href='" + url + "' target=_blank>View Tweet</a>" +
-      "</div>"
-      var marker = L.marker(new L.LatLng(coords[1], coords[0]), {
-        icon: L.mapbox.marker.icon({
-          'marker-color': '89C9FA',
-          'marker-size': 'medium'
-        }),
-        description: text
-      });
-      marker.bindPopup(text);
-      clusterLayer.addLayer(marker);
+      that.insertTweetOnMap(tweet, clusterLayer);
     });
 
     this.pointsLayer = clusterLayer;
@@ -257,13 +315,8 @@ var TwitterMapController = React.createClass({
             </Accordion>
           </div>
           <div className="update-setting-container">
-            <Accordion title={"Tweets update setting"} active={"active"}>
-              <UpdateSetting onCheck={this.onCheckAutoUpdate} />
-            </Accordion>
-          </div>
-          <div className="update-setting-container">
             <Accordion title={"Statistics"} active={"active"}>
-              <Counter number={this.state.number} />
+              <Counter number={this.state.number} positive={this.state.positive} negative={this.state.negative} neutral={this.state.neutral} new_tweets={this.state.new_tweets} new_tweets_on_map={this.state.new_tweets_on_map} />
             </Accordion>
           </div>
         </Menu>

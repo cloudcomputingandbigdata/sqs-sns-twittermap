@@ -33,6 +33,8 @@ class DataProcess:
 
             print coordinates
 
+            data_json['new_coordinates'] = coordinates
+
             timestamp = data_json['timestamp_ms']
             datetime = data_json['created_at']
             author = data_json['user']['name']
@@ -43,3 +45,34 @@ class DataProcess:
             self.ss.insert_tweet(id, contents, author, screen_name, timestamp, datetime, location_name, coordinates, country_code, country, sentiment)
 
             # print(data)
+
+        return json.dumps(data_json)
+
+    def transform(self, tweet):
+        tweet = json.loads(tweet)
+
+        icon = {
+            "iconSize": [50, 50],
+            "iconAnchor": [25, 25],
+            "popupAnchor": [0, -25],
+        }
+        icon['iconUrl'] = '/static/twittermap/img/' + tweet['sentiment'] + '.png'
+
+        hit = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": tweet['new_coordinates']
+            },
+            "properties": {
+                "title": tweet['user']['name'],
+                "description": tweet['text'],
+                "datetime": tweet['created_at'],
+                "tweet_id": tweet['id_str'],
+                "screen_name": tweet['user']['screen_name'],
+                "sentiment": tweet['sentiment'],
+                "icon": icon
+            }
+        }
+
+        return hit

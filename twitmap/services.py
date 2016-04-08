@@ -126,6 +126,14 @@ class SearchServices:
         hits = []
         for h in res['hits']['hits']:
             h = h['_source']
+
+            icon = {
+                "iconSize": [50, 50],
+                "iconAnchor": [25, 25],
+                "popupAnchor": [0, -25],
+            }
+            icon['iconUrl'] = '/static/twittermap/img/' + h['sentiment'] + '.png'
+
             hit = {
                 "type": "Feature",
                 "geometry": {
@@ -138,7 +146,8 @@ class SearchServices:
                     "datetime": h['datetime'],
                     "tweet_id": h['tweet_id'],
                     "screen_name": h['screen_name'],
-                    "sentiment": h['sentiment']
+                    "sentiment": h['sentiment'],
+                    "icon": icon
                 }
             }
             hits.append(hit)
