@@ -36,14 +36,14 @@ var TwitterMapController = React.createClass({
 
   updateTweet(e) {
     var that = this;
-    if (e.data != 'no_new' && this.pointsLayer) {
+    if (e.data != 'no_new') {
       this.setState({
         new_tweets: that.state.new_tweets + 1
       }, function() {
         console.log('new_tweets:' + that.state.new_tweets);
         // console.log('new_tweets:' + e.data);
         var tweet = JSON.parse(e.data);
-        if (tweet.geometry.coordinates) {
+        if (tweet.geometry.coordinates && this.pointsLayer) {
           if (that.state.keyword && tweet.properties.description.indexOf(that.state.keyword) > 0) {
             console.log("New tweet contains the keyword. Should update it on map!!!")
             that.insertTweetOnMap(tweet, that.pointsLayer);
