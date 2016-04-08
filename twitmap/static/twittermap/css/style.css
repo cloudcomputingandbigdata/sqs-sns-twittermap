@@ -198,6 +198,10 @@ body {
   color: blue;
 }
 
+.counter-container .stat-number.red {
+  color: red;
+}
+
 /* applying button */
 .apply-btn{
   position: relative;

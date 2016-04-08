@@ -26,9 +26,9 @@ var TwitterMapController = React.createClass({
       lon: null,
       isAuto: false,
       number: 0,
-      positive: 0,
-      negative: 0,
-      neutral: 0,
+//      positive: 0,
+//      negative: 0,
+//      neutral: 0,
       new_tweets: 0,
       new_tweets_on_map: 0
     }
@@ -54,6 +54,8 @@ var TwitterMapController = React.createClass({
           }
         }
       });
+    } else { // for debug
+      console.log('e.data: ' + e.data);
     }
   },
 
@@ -192,7 +194,7 @@ var TwitterMapController = React.createClass({
     clusterLayer.addLayer(marker);
 
     // console.log(tweet.properties.sentiment)
-    if (tweet.properties.sentiment == 'positive') {
+    /*if (tweet.properties.sentiment == 'positive') {
       this.setState({
         positive: this.state.positive++
       })
@@ -204,7 +206,7 @@ var TwitterMapController = React.createClass({
       this.setState({
         neutral: this.state.neutral++
       })
-    }
+    }*/
   },
 
   showTweetsOnMap() {
@@ -316,7 +318,7 @@ var TwitterMapController = React.createClass({
           </div>
           <div className="update-setting-container">
             <Accordion title={"Statistics"} active={"active"}>
-              <Counter number={this.state.number} positive={this.state.positive} negative={this.state.negative} neutral={this.state.neutral} new_tweets={this.state.new_tweets} new_tweets_on_map={this.state.new_tweets_on_map} />
+              <Counter number={this.state.number} new_tweets={this.state.new_tweets} new_tweets_on_map={this.state.new_tweets_on_map} />
             </Accordion>
           </div>
         </Menu>
